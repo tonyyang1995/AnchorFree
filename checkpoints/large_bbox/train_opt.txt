@@ -1,0 +1,36 @@
+------------------------ OPTIONS -----------------------------
+               batch_size: 8                             
+           checkpoint_dir: checkpoints                   
+      checkpoint_interval: 1                             
+              compute_map: False                         
+               conf_thres: 0.5                           
+                 dataroot: datasets/visDrone/train/images
+             dataset_mode: visDrone                      
+             display_freq: 10                            
+                   epochs: 20                            
+      evaluation_interval: 1                             
+                  gpu_ids: 0,1                           
+   gradient_accumulations: 2                             
+                        h: 416                           
+                 img_size: 416                           
+                  isTrain: True                          
+                iter_name: latest.pth                    
+                     load: False                         
+                       lr: 0.0001                        
+                    model: yolov3                        
+      multiscale_training: True                          
+                    n_cpu: 8                             
+                     name: large_bbox                    
+                    ncols: 5                             
+                nms_thres: 0.3                           
+                noagument: False                         
+             nomultiscale: False                         
+        normalized_labels: True                          
+                 numClass: 3                             
+                    phase: train                         
+       pretrained_weights: None                          
+             start_epochs: 0                             
+                   suffix:                               
+                        w: 416                           
+------------------------  END   ------------------------------
+
