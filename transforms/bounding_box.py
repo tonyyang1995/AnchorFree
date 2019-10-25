@@ -65,7 +65,7 @@ class BBox(object):
         return BBox.from_xyhw(bboxes, image_size, normalized=True)
 
     @staticmethod
-    def from_cityscapes(bboxes, image_size, normalized=False):
+    def from_visDrone(bboxes, image_size, normalized=False):
         #w_factor, h_factor = image_size if normalized else (1, 1)
         bboxes = _validate_bboxes(bboxes)
         image_size = _validate_size(image_size)

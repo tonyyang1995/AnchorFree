@@ -29,69 +29,69 @@ class VisDrone(BaseDataset):
 	# the GPU device on UAVs can be very limited
 	# and we want to make the large images as small as possible
 	# so we split the images into small parts and deal with it
-	def __getitem__(self, index):
-		img_path = self.img_paths[index]
-		if not os.path.exists(img_path):
-			assert RuntimeError("Image path not find")
-		label_path = self.label_paths[index]
-		if not os.path.exists(label_path):
-			assert RuntimeError("label path not find")
-
-		img = Image.open(img_path).convert('RGB')
-		bboxes = BBox.from_cityscapes(np.loadtxt(label_path, delimiter=',').reshape(-1,8), img.size)
-		targets = bboxes.non_max_merge(box_size=540, iou_thresh=0.5).to_tensor()
 	# def __getitem__(self, index):
 	# 	img_path = self.img_paths[index]
 	# 	if not os.path.exists(img_path):
-	# 		assert RuntimeError('Image path not find')
-
+	# 		assert RuntimeError("Image path not find")
 	# 	label_path = self.label_paths[index]
 	# 	if not os.path.exists(label_path):
-	# 		assert RuntimeError('Label path not find')
+	# 		assert RuntimeError("label path not find")
 
 	# 	img = Image.open(img_path).convert('RGB')
-	# 	bboxes = BBox.from_cityscapes(np.loadtxt(label_path, delimiter=',').reshape(-1,8), img.size)
+	# 	bboxes = BBox.from_visDrone(np.loadtxt(label_path, delimiter=',').reshape(-1,8), img.size)
+	# 	targets = bboxes.non_max_merge(box_size=540, iou_thresh=0.5).to_tensor()
+	def __getitem__(self, index):
+		img_path = self.img_paths[index]
+		if not os.path.exists(img_path):
+			assert RuntimeError('Image path not find')
 
-	# 	# target 
-	# 	# still need the NMM to get the cluster
+		label_path = self.label_paths[index]
+		if not os.path.exists(label_path):
+			assert RuntimeError('Label path not find')
+
+		img = Image.open(img_path).convert('RGB')
+		bboxes = BBox.from_visDrone(np.loadtxt(label_path, delimiter=',').reshape(-1,8), img.size)
+
+		# target 
+		# still need the NMM to get the cluster
 		
-	# 	target = bboxes.to_tensor()
-	# 	print(target[0])
-	# 	img = transforms.ToTensor()(img)
+		target = bboxes.to_tensor()
+		print(target[0])
+		img = transforms.ToTensor()(img)
 
-	# 	# handle gray scale channels
-	# 	if len(img.shape) != 3:
-	# 		img = img.unsqueeze(0)
-	# 		img = img.expand((3, img.shape[1:]))
+		# handle gray scale channels
+		if len(img.shape) != 3:
+			img = img.unsqueeze(0)
+			img = img.expand((3, img.shape[1:]))
 
-	# 	# add pad
-	# 	_, h, w = img.shape
-	# 	h_factor, w_factor = (h, w) if self.normalized_labels else (1, 1)
-	# 	img, pad = self.pad_to_square(img, 0)
-	# 	_, padded_h, padded_w = img.shape
+		# add pad
+		_, h, w = img.shape
+		h_factor, w_factor = (h, w) if self.normalized_labels else (1, 1)
+		img, pad = self.pad_to_square(img, 0)
+		_, padded_h, padded_w = img.shape
 
-	# 	# we only need to know whether there is a cluster or not
-	# 	x1 = w_factor * (target[:, 1] - target[:, 3] / 2)
-	# 	x2 = w_factor * (target[:, 1] + target[:, 3] / 2)
-	# 	y1 = h_factor * (target[:, 2] - target[:, 4] / 2)
-	# 	y2 = h_factor * (target[:, 2] + target[:, 4] / 2)
+		# we only need to know whether there is a cluster or not
+		x1 = w_factor * (target[:, 1] - target[:, 3] / 2)
+		x2 = w_factor * (target[:, 1] + target[:, 3] / 2)
+		y1 = h_factor * (target[:, 2] - target[:, 4] / 2)
+		y2 = h_factor * (target[:, 2] + target[:, 4] / 2)
 
-	# 	x1 += pad[0]
-	# 	x2 += pad[0]
-	# 	y1 += pad[2]
-	# 	y2 += pad[2]
+		x1 += pad[0]
+		x2 += pad[0]
+		y1 += pad[2]
+		y2 += pad[2]
 
-	# 	target[:, 0] = 1
-	# 	# boxes format is (x1,y1, x2, y2)
-	# 	target[:, 1] = ((x1 + x2) / 2) / padded_w
-	# 	target[:, 2] = ((y1 + y2) / 2) / padded_h
-	# 	target[:, 3] *= w_factor / padded_w
-	# 	target[:, 4] *= h_factor / padded_h
+		target[:, 0] = 1
+		# boxes format is (x1,y1, x2, y2)
+		target[:, 1] = ((x1 + x2) / 2) / padded_w
+		target[:, 2] = ((y1 + y2) / 2) / padded_h
+		target[:, 3] *= w_factor / padded_w
+		target[:, 4] *= h_factor / padded_h
 
-	# 	img_idx = torch.zeros(target.size(0), 1)
-	# 	target = torch.cat((img_idx, target), -1)
+		img_idx = torch.zeros(target.size(0), 1)
+		target = torch.cat((img_idx, target), -1)
 
-	# 	return img, target
+		return img, target
 
 	def __len__(self):
 		return len(self.img_paths)
